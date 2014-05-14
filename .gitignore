@@ -2,15 +2,6 @@
 /.loadpath
 /.powrc
 /.rvmrc
-/config/additional_environment.rb
-/config/configuration.yml
-/config/email.yml
-/config/initializers/session_store.rb
-/config/initializers/secret_token.rb
-/coverage
-/db/*.db
-/db/*.sqlite3
-/db/schema.rb
 /files/*
 /lib/redmine/scm/adapters/mercurial/redminehelper.pyc
 /lib/redmine/scm/adapters/mercurial/redminehelper.pyo
