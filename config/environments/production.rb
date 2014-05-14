@@ -29,4 +29,11 @@ RedmineApp::Application.configure do
   config.action_mailer.logger = nil
 
   config.active_support.deprecation = :log
+  
+  config.mfa_app_id = 'abc9e0cbabf113d1ecdf9b6908a901123e1b7b272c1ca292497e4fcdf99df21d7'
+  config.mfa_callback_url = 'http://rocky-island-1327.herokuapp.com/my/mfa/callback'
+  config.mfa_site = 'http://m2m.acceptto.net'
+  config.mfa_secret = '86b6b653b42af4222c0f605c92ba856c73fed60b9f10af6f941ea31c12fa9a57'
+  config.faye_server = 'https://faye.acceptto.net/faye'
+  config.authorize_link = 'http://m2m.acceptto.net/mfa/email?uid=abc9e0cbabf113d1ecdf9b6908a901123e1b7b272c1ca292497e4fcdf99df21d7'
 end
