@@ -72,6 +72,7 @@ RedmineApp::Application.routes.draw do
   match 'my/add_block', :controller => 'my', :action => 'add_block', :via => :post
   match 'my/remove_block', :controller => 'my', :action => 'remove_block', :via => :post
   match 'my/order_blocks', :controller => 'my', :action => 'order_blocks', :via => :post
+  match 'my/mfa/callback', :controller => 'my', :action => 'callback', :via => :get
 
   resources :users
   match 'users/:id/memberships/:membership_id', :to => 'users#edit_membership', :via => :put, :as => 'user_membership'

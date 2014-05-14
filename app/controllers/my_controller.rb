@@ -198,4 +198,13 @@ class MyController < ApplicationController
     end
     render :nothing => true
   end
+  
+  # Enabling Multi-Factor Authentication via Acceptto
+  def callback
+      user = User.current
+      user.update_attribute(:mfa_access_token, params[:access_token])
+      user.update_attribute(:mfa_authenticated, true)
+
+      redirect_to my_account_path, notice: "MFA Access Granted"
+  end
 end
