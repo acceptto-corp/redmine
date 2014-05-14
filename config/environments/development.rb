@@ -16,4 +16,11 @@ RedmineApp::Application.configure do
   config.action_mailer.raise_delivery_errors = false
 
   config.active_support.deprecation = [:stderr, :log]
+  
+  config.mfa_app_id = 'abc9e0cbabf113d1ecdf9b6908a901123e1b7b272c1ca292497e4fcdf99df21d7'
+  config.mfa_callback_url = 'http://localhost:3000/auth/mfa/callback'
+  config.mfa_site = 'http://0.0.0.0:3002'
+  config.mfa_secret = '96a6b653b42af4222c0f605c92ba856c73fed60b9f10af6f941ea31c12fa9a56'
+  config.faye_server = 'https://0.0.0.0:9292/faye'
+  config.authorize_link = 'http://0.0.0.0:3002/mfa/email?uid=abc9e0cbabf113d1ecdf9b6908a901123e1b7b272c1ca292497e4fcdf99df21d7'
 end

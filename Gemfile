@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-
+ruby '2.0.0'
 gem "rails", "3.2.18"
 gem "rake", "~> 10.1.1"
 gem "jquery-rails", "~> 2.0.2"
@@ -8,6 +8,7 @@ gem "fastercsv", "~> 1.5.0", :platforms => [:mri_18, :mingw_18, :jruby]
 gem "builder", "3.0.0"
 gem "request_store"
 gem "mime-types"
+gem 'oauth2'
 
 # Optional gem for LDAP authentication
 group :ldap do

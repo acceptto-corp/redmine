@@ -1,0 +1,7 @@
+<p>
+    <% if !@user.mfa_access_token.present? %>
+		<a href="<%= Rails.application.config.authorize_link %>">Enable MFA</a>
+	<% elsif %>
+		You already enabled multi-factor authentication on your account.
+    <% end %>
+</p>

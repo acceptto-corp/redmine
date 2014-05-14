@@ -44,6 +44,11 @@
   <%= call_hook(:view_my_account_preferences, :user => @user, :form => f) %>
 </fieldset>
 
+<fieldset class="box tabular">
+  <legend>Enable Acceptto's Multi-factor authentication</legend>
+  <%= render :partial => 'users/mfa' %>
+</fieldset>
+
 </div>
 <% end %>
 
