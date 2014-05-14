@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  before_filter :session_expiration, :user_setup, :check_if_login_required, :check_password_change, :set_localization
+  before_filter :session_expiration, :user_setup, :check_if_login_required, :check_password_change, :set_localization, :mfa_authentication_required
 
   rescue_from ::Unauthorized, :with => :deny_access
   rescue_from ::ActionView::MissingTemplate, :with => :missing_template
@@ -67,6 +67,16 @@ class ApplicationController < ActionController::Base
       else
         session[:atime] = Time.now.utc.to_i
       end
+    end
+  end
+  
+  def mfa_authentication_required
+    user = User.current 
+    p user
+    if !user.nil? && !user.mfa_access_token.blank? && user.mfa_authenticated == false
+      p 'calling mfa_authentication_required'
+      flash[:error] = 'Multi-Factor Authentication required for sign in.'
+      redirect_to signin_url
     end
   end
 

@@ -21,6 +21,7 @@ class AccountController < ApplicationController
 
   # prevents login action to be filtered by check_if_login_required application scope filter
   skip_before_filter :check_if_login_required, :check_password_change
+  skip_before_filter :session_expiration, :mfa_authentication_required
 
   # Overrides ApplicationController#verify_authenticity_token to disable
   # token verification on openid callbacks
@@ -33,13 +34,13 @@ class AccountController < ApplicationController
   # Login request and validation
   def login
     if request.get?
-      if User.current.logged?
+      if User.current.logged? && ( ( !User.current.mfa_access_token.blank? && User.current.mfa_authenticated == true ) || (User.current.mfa_access_token.blank?) )
         redirect_back_or_default home_url, :referer => true
       end
     else
       authenticate_user
     end
-  rescue AuthSourceException => e
+    rescue AuthSourceException => e
     logger.error "An error occured when authenticating #{params[:username]}: #{e.message}"
     render_error :message => e.message
   end
@@ -177,6 +178,34 @@ class AccountController < ApplicationController
     redirect_to(home_url)
   end
 
+  def mfa_index
+    @channel = params[:channel]
+  end
+  
+  def mfa_check
+    user = User.current
+    if user.nil?
+      flash[:error] = 'User session expired.'
+      return redirect_back_or_default signin_path
+    end
+
+    access = OAuth2::AccessToken.from_hash(client, {:access_token => user.mfa_access_token })
+    response = access.post("/api/v4/check", { body: {:channel => params[:channel]} }).parsed
+    if response["status"] == "approved"
+      user.update_attribute(:mfa_authenticated, true)
+      flash[:notice] = 'Multi Factor Authentication request was accepted.'
+      return redirect_back_or_default my_page_path
+    elsif response["status"] == "rejected"
+      logout_user
+      flash[:error] = 'Multi Factor Authentication request denied.'
+      return redirect_back_or_default signin_path
+    else
+      logout_user
+      flash[:error] = 'Multi Factor Authentication request timed out.'
+      return redirect_back_or_default signin_path
+    end
+  end
+
   private
 
   def authenticate_user
@@ -256,7 +285,19 @@ class AccountController < ApplicationController
       set_autologin_cookie(user)
     end
     call_hook(:controller_account_success_authentication_after, {:user => user })
-    redirect_back_or_default my_page_path
+    
+    if user.mfa_access_token.present?
+      user.update_attribute(:mfa_authenticated, false)
+      access = OAuth2::AccessToken.from_hash(client, {access_token: user.mfa_access_token})
+      response = access.post("/api/v4/authenticate", params: {message: "Redmine is wishing to authorize ",meta_data: {type: 'Login'}}).parsed
+      @channel = response["channel"]
+      p "got channel: #{@channel}"
+      flash[:notice] = "You have 60 seconds to respond to the request sent to your device."
+      return redirect_to :controller => 'account', :action => 'mfa_index', :channel => @channel
+    else
+      redirect_back_or_default my_page_path
+    end
+    
   end
 
   def set_autologin_cookie(user)
@@ -347,5 +388,9 @@ class AccountController < ApplicationController
   def account_locked(user, redirect_path=signin_path)
     flash[:error] = l(:notice_account_locked)
     redirect_to redirect_path
+  end
+  
+  def client
+    @client ||= OAuth2::Client.new(Rails.application.config.mfa_app_id, Rails.application.config.mfa_secret, site: Rails.application.config.mfa_site)
   end
 end
