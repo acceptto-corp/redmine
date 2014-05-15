@@ -201,10 +201,16 @@ class MyController < ApplicationController
   
   # Enabling Multi-Factor Authentication via Acceptto
   def callback
-      user = User.current
-      user.update_attribute(:mfa_access_token, params[:access_token])
-      user.update_attribute(:mfa_authenticated, true)
+    if params[:access_token].blank?
+      flash[:error] = "MFA Access Denied!"
+      return redirect_to my_account_path
+    end
 
-      redirect_to my_account_path, notice: "MFA Access Granted"
+    user = User.current
+    user.mfa_access_token = params[:access_token]
+    user.mfa_authenticated = true
+    user.save
+    flash[:notice] = "MFA Access Granted"
+    redirect_to my_account_path
   end
 end
