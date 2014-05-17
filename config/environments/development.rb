@@ -17,6 +17,7 @@ RedmineApp::Application.configure do
 
   config.active_support.deprecation = [:stderr, :log]
   
+  config.redmine_host = 'http://localhost:3000'
   config.mfa_app_id = 'abc9e0cbabf113d1ecdf9b6908a901123e1b7b272c1ca292497e4fcdf99df21d7'
   config.mfa_callback_url = 'http://localhost:3000/mfa/callback'
   config.mfa_site = 'http://0.0.0.0:3002'

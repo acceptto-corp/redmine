@@ -255,7 +255,7 @@ class AccountController < ApplicationController
     if params[:autologin] && Setting.autologin?
       set_autologin_cookie(user)
     end
-    call_hook(:controller_account_success_authentication_after, {:user => user })
+    call_hook(:controller_account_success_authentication_after, {:user => user, :params => params})
     redirect_back_or_default my_page_path
   end
 
